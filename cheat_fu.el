@@ -1,5 +1,5 @@
 ;; cheat_fu.el
-;; Time-stamp: <2011-04-25 04:15:49 jpablobr>
+;; Time-stamp: <2011-04-25 05:26:31 jpablobr>
 
 ;; Copyright (C) Jose Pablo Barrantes 2011 <xjpablobrx@gmail.com>
 
@@ -53,6 +53,12 @@
 (defvar cheat_fu-find-sheets-command "find \"%s\" -type f -name "
   "The command used to find sheets. %s will be replaced with the cheat_fu-root.")
 
+(defvar cheat_fu-list-sheets-command "cheat_fu -l"
+  "The command used to list all sheets.")
+
+(defvar cheat_fu-search-sheets-command "cheat_fu -s \"%s\" "
+  "The command used to find sheets. %s will be replaced with the search input.")
+
 (defvar *cheat_fu-completing-function-alist* '((ido ido-completing-read)
                                                (icicles  icicle-completing-read)
                                                (none completing-read))
@@ -67,6 +73,17 @@
 ;;; ----------------------------------------------------------------------------
 ;;; - Interctive Functions
 ;;;
+(defun cheat_fu-list ()
+  "Output paths to all sheets."
+  (interactive)
+  (cheat_fu-command "-l"))
+
+(defun cheat_fu-convert()
+  "Converts cheat_fu-sheets to man and html."
+  (interactive)
+  (shell-command-to-string
+   (cheat_fu-string-replace "%s" buffer-file-name cheat_fu-roff-convert-command)) t)
+
 (defun cheat_fu-sheets()
   "Uses your completing read to quickly jump to the sheets."
   (interactive)
@@ -80,15 +97,22 @@
         (replace-regexp-in-string cheat_fu-root "" e))
       (cheat_fu-project-files  cheat_fu-root))))))
 
-(defun cheat_fu-convert()
-  "Converts cheat_fu-sheets to man and html."
-  (interactive)
-  (shell-command-to-string
-   (cheat_fu-string-replace "%s" buffer-file-name cheat_fu-roff-convert-command)) t)
+(defun cheat_fu-search(what)
+  "Output paths to sheets matching search  'input'."
+  (interactive "sCheat_fu Sheet: ")
+    (cheat_fu-command "-l" what))
 
 ;;; ----------------------------------------------------------------------------
 ;;; - Helpers
 ;;;
+(defun cheat_fu-command (&rest rest)
+  "Run the cheat_fu command with the given arguments, display the output."
+  (interactive "sArguments for cheat_fu: \n")
+  (let* ((cmd (string-join " " rest))
+         (buffer (get-buffer-create
+                  (concat "*Cheat_fu: " cmd "*"))))
+      (shell-command (concat "cheat_fu " cmd) buffer)))
+
 (defun cheat_fu-completing-read (&rest args)
   "Uses `*cheat_fu-completing-function-alist*' to call the appropriate completing
   function."
