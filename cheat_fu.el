@@ -1,5 +1,5 @@
 ;; cheat_fu.el
-;; Time-stamp: <2011-04-25 05:26:31 jpablobr>
+;; Time-stamp: <2011-04-25 05:32:31 jpablobr>
 
 ;; Copyright (C) Jose Pablo Barrantes 2011 <xjpablobrx@gmail.com>
 
@@ -78,13 +78,18 @@
   (interactive)
   (cheat_fu-command "-l"))
 
-(defun cheat_fu-convert()
+(defun cheat_fu-search(what)
+  "Output paths to sheets matching search  'input'."
+  (interactive "sCheat_fu Sheet: ")
+    (cheat_fu-command "-l" what))
+
+(defun cheat_fu-convert ()
   "Converts cheat_fu-sheets to man and html."
   (interactive)
   (shell-command-to-string
    (cheat_fu-string-replace "%s" buffer-file-name cheat_fu-roff-convert-command)) t)
 
-(defun cheat_fu-sheets()
+(defun cheat_fu-sheets ()
   "Uses your completing read to quickly jump to the sheets."
   (interactive)
   (find-file
@@ -96,11 +101,6 @@
       (lambda (e)
         (replace-regexp-in-string cheat_fu-root "" e))
       (cheat_fu-project-files  cheat_fu-root))))))
-
-(defun cheat_fu-search(what)
-  "Output paths to sheets matching search  'input'."
-  (interactive "sCheat_fu Sheet: ")
-    (cheat_fu-command "-l" what))
 
 ;;; ----------------------------------------------------------------------------
 ;;; - Helpers
