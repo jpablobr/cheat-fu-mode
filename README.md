@@ -5,7 +5,7 @@ This minor mode exists to provide [Emacs](http://www.gnu.org/software/emacs/) wi
 
 ## Features:
 
-Quickly jump to the cheat_fu sheets for fast viewing and editing.
+Quickly jump between cheat_fu sheets for fast viewing and editing.
 
 ## Installation:
 

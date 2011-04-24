@@ -1,5 +1,5 @@
 ;; cheat_fu.el
-;; Time-stamp: <2011-04-25 03:24:03 jpablobr>
+;; Time-stamp: <2011-04-25 04:15:49 jpablobr>
 
 ;; Copyright (C) Jose Pablo Barrantes 2011 <xjpablobrx@gmail.com>
 
@@ -28,20 +28,29 @@
 ;; (require 'cheat_fu)
 ;; (setq cheat_fu-root "/path/to/.cheat_fu_sheets/")
 
-;; Customization
+;;; ----------------------------------------------------------------------------
+;;; - Customization
+;;;
 (defcustom cheat_fu-root nil
   "Used internally for defining cheat_fu_sheets root path."
   :group 'cheat_fu
   :type 'string)
 
-(defvar *cheat_fu-to-include* "*.ronn"
+;;; ----------------------------------------------------------------------------
+;;; - Cheat_fu config
+;;;
+(defvar *cheat_fu-to-include* "*.1.ronn"
   "Regexp of files to exclude from `cheat_fu-sheets'.")
 
 (defvar cheat_fu-completing-library 'ido
   "The library `cheat_fu-sheets' should use for
   completing sheets (`ido' by default)")
 
-(defvar cheat_fu-find-files-command "find \"%s\" -type f -name "
+(defvar cheat_fu-roff-convert-command "ronn --roff --html \"%s\" "
+  "The command used to convert sheets to man and html pages. %s will be
+  replaced with the current cheat_fu-sheet.")
+
+(defvar cheat_fu-find-sheets-command "find \"%s\" -type f -name "
   "The command used to find sheets. %s will be replaced with the cheat_fu-root.")
 
 (defvar *cheat_fu-completing-function-alist* '((ido ido-completing-read)
@@ -55,11 +64,9 @@
     (none ,(lambda (a) ())))
   "The list of functions to enable and disable completing minor modes")
 
-(defun cheat_fu-ido-fix ()
-  "Add up/down keybindings for ido."
-  (define-key ido-completion-map [up] 'ido-prev-match)
-  (define-key ido-completion-map [down] 'ido-next-match))
-
+;;; ----------------------------------------------------------------------------
+;;; - Interctive Functions
+;;;
 (defun cheat_fu-sheets()
   "Uses your completing read to quickly jump to the sheets."
   (interactive)
@@ -73,6 +80,15 @@
         (replace-regexp-in-string cheat_fu-root "" e))
       (cheat_fu-project-files  cheat_fu-root))))))
 
+(defun cheat_fu-convert()
+  "Converts cheat_fu-sheets to man and html."
+  (interactive)
+  (shell-command-to-string
+   (cheat_fu-string-replace "%s" buffer-file-name cheat_fu-roff-convert-command)) t)
+
+;;; ----------------------------------------------------------------------------
+;;; - Helpers
+;;;
 (defun cheat_fu-completing-read (&rest args)
   "Uses `*cheat_fu-completing-function-alist*' to call the appropriate completing
   function."
@@ -86,7 +102,7 @@
   (split-string
    (shell-command-to-string
     (concat
-     (cheat_fu-string-replace "%s" root cheat_fu-find-files-command)
+     (cheat_fu-string-replace "%s" root cheat_fu-find-sheets-command)
      *cheat_fu-to-include*
      " | sed 's:"
      cheat_fu-root
