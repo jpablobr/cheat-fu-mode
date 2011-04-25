@@ -1,5 +1,5 @@
 ;; cheat_fu.el
-;; Time-stamp: <2011-04-25 05:32:31 jpablobr>
+;; Time-stamp: <2011-04-25 10:58:16 jpablobr>
 
 ;; Copyright (C) Jose Pablo Barrantes 2011 <xjpablobrx@gmail.com>
 
@@ -39,6 +39,10 @@
 ;;; ----------------------------------------------------------------------------
 ;;; - Cheat_fu config
 ;;;
+(define-button-type 'cheat_fu-find-file-button
+  'follow-link t
+  'action #'cheat_fu-find-file-button)
+
 (defvar *cheat_fu-to-include* "*.1.ronn"
   "Regexp of files to exclude from `cheat_fu-sheets'.")
 
@@ -102,16 +106,33 @@
         (replace-regexp-in-string cheat_fu-root "" e))
       (cheat_fu-project-files  cheat_fu-root))))))
 
+(defun cheat_fu-buttonize-buffer ()
+  "turn all file paths into buttons"
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward "/[^ \t]*" nil t)
+      (make-button (match-beginning 0) (match-end 0) :type 'cheat_fu-find-file-button))))
+
 ;;; ----------------------------------------------------------------------------
 ;;; - Helpers
 ;;;
 (defun cheat_fu-command (&rest rest)
   "Run the cheat_fu command with the given arguments, display the output."
   (interactive "sArguments for cheat_fu: \n")
-  (let* ((cmd (string-join " " rest))
-         (buffer (get-buffer-create
-                  (concat "*Cheat_fu: " cmd "*"))))
-      (shell-command (concat "cheat_fu " cmd) buffer)))
+  (let ((buffer (get-buffer-create "*Cheat_fu*"))
+        (cmd (string-join " " rest))
+        (inhibit-read-only t))
+    (setq next-error-last-buffer buffer)
+    (with-current-buffer buffer
+      (erase-buffer)
+      (cheat_fu-mode)
+      (setq buffer-read-only t)
+      (font-lock-fontify-buffer))
+    (shell-command (concat "cheat_fu " cmd) buffer)))
+
+(defun cheat_fu-find-file-button (button)
+  (find-file (buffer-substring (button-start button) (button-end button))))
 
 (defun cheat_fu-completing-read (&rest args)
   "Uses `*cheat_fu-completing-function-alist*' to call the appropriate completing
@@ -141,6 +162,29 @@
     (while (search-forward this nil t)
       (replace-match withthat nil t))
     (buffer-substring (point-min) (point-max))))
+
+;;; ----------------------------------------------------------------------------
+;;; - cheat_fu mode
+;;;
+(defvar cheat_fu-mode-map
+  (let ((keymap (make-sparse-keymap)))
+    (define-key keymap "l" 'cheat_fu-list)
+    (define-key keymap "s" 'cheat_fu-search)
+    (define-key keymap "c" 'cheat_fu-convert)
+    (define-key keymap "b" 'cheat_fu-buttonize-buffer)
+    keymap))
+
+;;;###autoload
+(define-minor-mode cheat_fu-mode "Cheat_Fu Emulation Minor Mode"
+  :lighter " cheat_fu"
+  (use-local-map cheat_fu-mode-map)
+  ; activate preferred completion library
+  (dolist (mode *cheat_fu-completing-minor-mode-alist*)
+    (if (eq (car mode) cheat_fu-completing-library)
+        (funcall (cadr mode) t)
+      (when (fboundp
+             (cadr (assoc (car mode) *cheat_fu-completing-function-alist*)))
+        (funcall (cadr mode) -1)))))
 
 (provide 'cheat_fu)
 ;;; cheat_fu.el ends here
