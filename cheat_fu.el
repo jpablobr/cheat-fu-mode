@@ -1,5 +1,5 @@
 ;; cheat_fu.el
-;; Time-stamp: <2011-04-25 10:58:16 jpablobr>
+;; Time-stamp: <2011-04-25 14:39:03 jpablobr>
 
 ;; Copyright (C) Jose Pablo Barrantes 2011 <xjpablobrx@gmail.com>
 
@@ -121,14 +121,9 @@
   "Run the cheat_fu command with the given arguments, display the output."
   (interactive "sArguments for cheat_fu: \n")
   (let ((buffer (get-buffer-create "*Cheat_fu*"))
-        (cmd (string-join " " rest))
-        (inhibit-read-only t))
-    (setq next-error-last-buffer buffer)
+        (cmd (string-join " " rest)))
     (with-current-buffer buffer
-      (erase-buffer)
-      (cheat_fu-mode)
-      (setq buffer-read-only t)
-      (font-lock-fontify-buffer))
+      (cheat_fu-mode))
     (shell-command (concat "cheat_fu " cmd) buffer)))
 
 (defun cheat_fu-find-file-button (button)
@@ -179,12 +174,13 @@
   :lighter " cheat_fu"
   (use-local-map cheat_fu-mode-map)
   ; activate preferred completion library
-  (dolist (mode *cheat_fu-completing-minor-mode-alist*)
-    (if (eq (car mode) cheat_fu-completing-library)
-        (funcall (cadr mode) t)
-      (when (fboundp
-             (cadr (assoc (car mode) *cheat_fu-completing-function-alist*)))
-        (funcall (cadr mode) -1)))))
+  ;; (dolist (mode *cheat_fu-completing-minor-mode-alist*)
+  ;;   (if (eq (car mode) cheat_fu-completing-library)
+  ;;       (funcall (cadr mode) t)
+  ;;     (when (fboundp
+  ;;            (cadr (assoc (car mode) *cheat_fu-completing-function-alist*)))
+  ;;       (funcall (cadr mode) -1))))
+  )
 
 (provide 'cheat_fu)
 ;;; cheat_fu.el ends here
