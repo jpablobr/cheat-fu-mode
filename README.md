@@ -7,6 +7,14 @@ This minor mode exists to provide [Emacs](http://www.gnu.org/software/emacs/) wi
 
 Quickly jump between cheat_fu sheets for fast viewing and editing.
 
+
+### Key binding:
+
+*     "l" 'cheat_fu-list
+*     "s" 'cheat_fu-search
+*     "c" 'cheat_fu-convert
+*     "b" 'cheat_fu-buttonize-buffer
+
 ## Installation:
 
 In your emacs config:
