@@ -1,5 +1,5 @@
 ;; cheat-fu.el
-;; Time-stamp: <2011-04-26 21:34:50 jpablobr>
+;; Time-stamp: <2011-04-28 11:58:24 jpablobr>
 
 ;; Copyright (C) Jose Pablo Barrantes 2011 <xjpablobrx@gmail.com>
 
@@ -89,6 +89,19 @@
   (interactive)
   (shell-command-to-string
    (cheat-fu-string-replace "%s" buffer-file-name cheat-fu-roff-convert-command)) t)
+
+(defun cheat-fu-commit (what)
+  "Git commit all helper."
+  (interactive  "sCheat-fu commit msg: ")
+  (let ((buffer (shell "*cheat-fu commit*")))
+  (setq cmd  (concat
+              "cd "
+              cheat-fu-root
+              " && git add . && git commit -v -a -m" " \"cheat-fu.el commit: "
+              what (format-time-string "at: %a %Y-%m-%d - %l:%M %p\"")))
+    (ansi-color-for-comint-mode-on)
+    (compilation-shell-minor-mode 1)
+    (comint-send-string buffer (concat cmd "\n"))))
 
 (defun cheat-fu-sheets ()
   "Uses your completing read to quickly jump to the sheets."
