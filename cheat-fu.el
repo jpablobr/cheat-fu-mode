@@ -1,5 +1,5 @@
 ;; cheat-fu.el
-;; Time-stamp: <2011-04-28 11:58:24 jpablobr>
+;; Time-stamp: <2011-04-28 21:16:20 jpablobr>
 
 ;; Copyright (C) Jose Pablo Barrantes 2011 <xjpablobrx@gmail.com>
 
@@ -97,8 +97,8 @@
   (setq cmd  (concat
               "cd "
               cheat-fu-root
-              " && git add . && git commit -v -a -m" " \"cheat-fu.el commit: "
-              what (format-time-string "at: %a %Y-%m-%d - %l:%M %p\"")))
+              " && git add . && git commit -v -a -m" " \"cheat-fu-commit: "
+              what "\""))
     (ansi-color-for-comint-mode-on)
     (compilation-shell-minor-mode 1)
     (comint-send-string buffer (concat cmd "\n"))))
