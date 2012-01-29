@@ -1,4 +1,5 @@
-;; cheat-fu.el
+;;; cheat-fu.el --- An interface to the cheat-fu service
+
 ;; Time-stamp: <2011-04-28 21:16:20 jpablobr>
 
 ;; Copyright (C) Jose Pablo Barrantes 2011 <xjpablobrx@gmail.com>
